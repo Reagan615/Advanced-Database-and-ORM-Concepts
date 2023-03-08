@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Advanced_Database_and_ORM_Concepts_Lab01.Data;
 using Advanced_Database_and_ORM_Concepts_Lab01.Models;
+using Advanced_Database_and_ORM_Concepts_Lab01.Models.ViewModels;
 
 namespace Advanced_Database_and_ORM_Concepts_Lab01.Controllers
 {
@@ -22,7 +23,9 @@ namespace Advanced_Database_and_ORM_Concepts_Lab01.Controllers
         // GET: Customers
         public async Task<IActionResult> Index()
         {
-              return View(await _context.Customer.ToListAsync());
+            List<Customer> customeres = await _context.Customer.ToListAsync();
+
+            return View(customeres);
         }
 
         // GET: Customers/Details/5
@@ -157,5 +160,48 @@ namespace Advanced_Database_and_ORM_Concepts_Lab01.Controllers
         {
           return _context.Customer.Any(e => e.Id == id);
         }
+
+        public IActionResult CompareIndex()
+        {
+            CompareCustomerAddressVM compareCustomerAddressVM = new CompareCustomerAddressVM
+            {
+                CustomerIds = _context.Customer.Select(c => new SelectListItem
+                { Value = c.Id.ToString(), Text = c.FirstName }).ToList(),
+                AddressIds = _context.Address.Select(a => new SelectListItem
+                { Value = a.Id.ToString(), Text = a.AddressLine1 }).ToList()
+            };
+            return View(compareCustomerAddressVM);
+        }
+
+        [HttpPost]
+        public IActionResult CompareCustomerAddress(CompareCustomerAddressVM compareCustomerAddressVM)
+        {
+            if (!compareCustomerAddressVM.SelectedCustomerId.HasValue || !compareCustomerAddressVM.SelectedAddressId.HasValue)
+            {
+                compareCustomerAddressVM.CustomerIds = _context.Customer.Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.FirstName }).ToList();
+                compareCustomerAddressVM.AddressIds = _context.Address.Select(e => new SelectListItem { Value = e.Id.ToString(), Text = e.AddressLine1 }).ToList();
+
+                return View("CompareIndex", compareCustomerAddressVM);
+            }
+
+            CustomerAddress customerAddress = _context.CustomerAddress.FirstOrDefault(a => 
+            a.CustomerId == compareCustomerAddressVM.SelectedCustomerId.Value && a.AddressId == compareCustomerAddressVM.SelectedAddressId.Value);
+
+            if (customerAddress == null)
+            {
+                compareCustomerAddressVM.IsCustomerAtAddress = false;
+            }
+            else
+            {
+                compareCustomerAddressVM.IsCustomerAtAddress = true;
+            }
+
+            compareCustomerAddressVM.CustomerIds = _context.Customer.Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.FirstName }).ToList();
+            compareCustomerAddressVM.AddressIds = _context.Address.Select(e => new SelectListItem { Value = e.Id.ToString(), Text = e.AddressLine1 }).ToList();
+
+            return View("CompareIndex", compareCustomerAddressVM);
+        }
+
     }
+    
 }

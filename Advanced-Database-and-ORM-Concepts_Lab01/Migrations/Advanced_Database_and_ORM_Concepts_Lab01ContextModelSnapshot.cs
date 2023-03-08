@@ -46,16 +46,11 @@ namespace Advanced_Database_and_ORM_Concepts_Lab01.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("CustomerId")
-                        .HasColumnType("int");
-
                     b.Property<string>("StateProvince")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
 
                     b.ToTable("Address");
                 });
@@ -68,8 +63,10 @@ namespace Advanced_Database_and_ORM_Concepts_Lab01.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int?>("AddressId")
+                        .HasColumnType("int");
+
                     b.Property<string>("CompanyName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
@@ -81,24 +78,89 @@ namespace Advanced_Database_and_ORM_Concepts_Lab01.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AddressId");
+
                     b.ToTable("Customer");
                 });
 
-            modelBuilder.Entity("Advanced_Database_and_ORM_Concepts_Lab01.Models.Address", b =>
+            modelBuilder.Entity("Advanced_Database_and_ORM_Concepts_Lab01.Models.CustomerAddress", b =>
                 {
-                    b.HasOne("Advanced_Database_and_ORM_Concepts_Lab01.Models.Customer", null)
-                        .WithMany("Addresses")
-                        .HasForeignKey("CustomerId");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("AddressId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CustomerAddressId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsOwner")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AddressId");
+
+                    b.HasIndex("CustomerAddressId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("CustomerAddress");
                 });
 
             modelBuilder.Entity("Advanced_Database_and_ORM_Concepts_Lab01.Models.Customer", b =>
                 {
-                    b.Navigation("Addresses");
+                    b.HasOne("Advanced_Database_and_ORM_Concepts_Lab01.Models.Address", null)
+                        .WithMany("Customers")
+                        .HasForeignKey("AddressId");
+                });
+
+            modelBuilder.Entity("Advanced_Database_and_ORM_Concepts_Lab01.Models.CustomerAddress", b =>
+                {
+                    b.HasOne("Advanced_Database_and_ORM_Concepts_Lab01.Models.Address", "Address")
+                        .WithMany()
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Advanced_Database_and_ORM_Concepts_Lab01.Models.CustomerAddress", null)
+                        .WithMany("CustomerAddresses")
+                        .HasForeignKey("CustomerAddressId");
+
+                    b.HasOne("Advanced_Database_and_ORM_Concepts_Lab01.Models.Customer", "Customer")
+                        .WithMany("CustomerAddresses")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Address");
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("Advanced_Database_and_ORM_Concepts_Lab01.Models.Address", b =>
+                {
+                    b.Navigation("Customers");
+                });
+
+            modelBuilder.Entity("Advanced_Database_and_ORM_Concepts_Lab01.Models.Customer", b =>
+                {
+                    b.Navigation("CustomerAddresses");
+                });
+
+            modelBuilder.Entity("Advanced_Database_and_ORM_Concepts_Lab01.Models.CustomerAddress", b =>
+                {
+                    b.Navigation("CustomerAddresses");
                 });
 #pragma warning restore 612, 618
         }
