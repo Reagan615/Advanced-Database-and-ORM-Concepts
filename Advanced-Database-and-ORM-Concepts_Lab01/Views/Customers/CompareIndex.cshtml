@@ -1,0 +1,30 @@
+﻿@model Advanced_Database_and_ORM_Concepts_Lab01.Models.ViewModels.CompareCustomerAddressVM
+
+<h1>Compare Customer and Address</h1>
+
+<form asp-action="CompareCustomerAddress" method="post">
+    <div>
+        <label>Select Customer:</label>
+        <select asp-for="SelectedCustomerId" asp-items="Model.CustomerIds"></select>
+    </div>
+    <div>
+        <label>Select Address:</label>
+        <select asp-for="SelectedAddressId" asp-items="Model.AddressIds"></select>
+    </div>
+    <input type="submit" value="Compare" />
+</form>
+
+
+@if (Model.SelectedCustomerId.HasValue && Model.SelectedAddressId.HasValue)
+{
+    <h2>Result:</h2>
+    @if (Model.IsCustomerAtAddress)
+    {
+        
+        <p>The customer lives at the selected address.</p>
+    }
+    else
+    {
+        <p>The customer does not live at the selected address.</p>
+    }
+}
