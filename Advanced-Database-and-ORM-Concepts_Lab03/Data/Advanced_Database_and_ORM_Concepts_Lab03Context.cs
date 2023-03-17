@@ -14,6 +14,9 @@ namespace Advanced_Database_and_ORM_Concepts_Lab03.Data
         {
         }
 
-        public DbSet<Advanced_Database_and_ORM_Concepts_Lab03.Models.Client> Client { get; set; } = default!;
+       
+
+        public DbSet<Client> Client { get; set; } = default!;
+        public DbSet<Room> Room { get; set; } = default!;
     }
 }
